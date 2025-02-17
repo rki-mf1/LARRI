@@ -1,0 +1,8 @@
+.nextflow*
+.DS_Store
+results/
+work/
+timeline*.html
+singularity/
+report*
+conda/
