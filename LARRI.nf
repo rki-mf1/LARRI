@@ -23,27 +23,34 @@ include { filtlong } from './modules/filtlong.nf'
 include { rasusa } from './modules/rasusa.nf'
 include { flye } from './modules/flye.nf'
 include { medaka } from './modules/medaka.nf'
+include { dorado_basecall } from './modules/dorado.nf'
 
 // INPUT FILES
 
-// BAM file
-if (!params.bam) { 
-    println  """ERROR: You must specify a BAM file using the -bam option.
-    \033[0;33mUsage example:\033[0m
-nextflow LARRI.nf  --bam '*.bam' 
+// Ensure either BAM or pod5 is specified, but not both
+if (!params.bam && !params.pod5) { 
+    error """\033[0;31mERROR:\033[0m You must specify either a BAM file/folder using the --bam option OR a pod5 file/folder using the --pod5 option.
     
+    \033[0;33mUsage example:\033[0m
+    nextflow LARRI.nf --bam '*.bam' 
+    nextflow LARRI.nf --pod5 '*.pod5'
     """
-
-}
-
-if (params.bam && params.list) { bam_input_ch = Channel
-  .fromPath( params.bam, checkIfExists: true )
-  .splitCsv()
-  .map { row -> [row[0], file("${row[1]}", checkIfExists: true)] }
-  }
-  else if (params.bam) { bam_input_ch = Channel
-    .fromPath( params.bam, checkIfExists: true)
-    .map { file -> tuple(file.baseName, file) }
+    exit 1
+} else if (params.bam && params.pod5) {
+    error """\033[0;31mERROR:\033[0m You cannot specify both --bam and --pod5 at the same time. Please provide only one.
+    
+    \033[0;33mUsage example:\033[0m
+    nextflow LARRI.nf --bam '*.bam' 
+    nextflow LARRI.nf --pod5 '*.pod5'
+    """
+    exit 1
+} else if (params.bam) { 
+    bam_input_ch = Channel
+        .fromPath(params.bam, checkIfExists: true)
+        .map { file -> tuple(file.baseName, file) }
+} else { 
+    pod5_input_ch = Channel
+        .fromPath(params.pod5, checkIfExists: true)
 }
 
 
@@ -52,12 +59,21 @@ if (params.bam && params.list) { bam_input_ch = Channel
 ************************/
 
 workflow {
+
+  // workflow with BAM input (only assembly) 
+  if (params.bam) {
   fastq_files = bam2fastq(bam_input_ch)
   fastq_filtered_files = filtlong(fastq_files)
   fastq_filtered_subsampled_files = rasusa(fastq_filtered_files)
   fasta_files = flye(fastq_filtered_subsampled_files).assembly
   input_medaka = fastq_filtered_subsampled_files.join(fasta_files)
-  polished_files = medaka(input_medaka).polished_assembly
+  polished_files = medaka(input_medaka).polished_assembly 
+  } 
+  // worfklow with pod5 input (dorado basecalling)
+  else if (params.pod5) {
+    fastq_files = dorado_basecall(pod5_input_ch)
+  }
+
 }
 
 

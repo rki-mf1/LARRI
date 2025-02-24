@@ -7,3 +7,4 @@ singularity/
 report*
 conda/
 data/
+dorado_models/
