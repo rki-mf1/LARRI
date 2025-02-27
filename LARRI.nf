@@ -84,9 +84,20 @@ workflow {
 		if (params.demux) {
 			basecalled_bam = dorado_basecaller(pod5_input_ch)
 			dorado_sheet = sample_sheet_path ? transform_csv(sample_sheet_path) : ""
-			bam_folder = dorado_demux(basecalled_bam, dorado_sheet)
+			bam_files = dorado_demux(basecalled_bam, dorado_sheet).flatten()
+			bam_files_filtered = bam_files.filter { file ->
+				file.simpleName != "unclassified"  
+			}.map {file -> tuple(file.baseName, file)}.view()
+			 
+			// assembly
+			fastq_files = bam2fastq(bam_files_filtered)
+			fastq_filtered_files = filtlong(fastq_files)
+			fastq_filtered_subsampled_files = rasusa(fastq_filtered_files)
+			fasta_files = flye(fastq_filtered_subsampled_files).assembly
+			input_medaka = fastq_filtered_subsampled_files.join(fasta_files)
+			polished_files = medaka(input_medaka).polished_assembly 
 		} 
-		
+
 		else {
 			bam_folder = dorado_basecaller(pod5_input_ch)
 		}

@@ -36,14 +36,14 @@ process dorado_basecaller{
 
 process dorado_demux{    
     label 'dorado'
-    publishDir "${params.outdir}", mode: 'copy'
+    publishDir "${params.outdir}/", mode: 'copy'
 
     input:
     path(path_basecalling)
     val(dorado_sheet)
 
     output:
-    path("${path_basecalling.simpleName}_results_demux"), emit: dorado_demux_folder
+    path("${path_basecalling.simpleName}_results_demux/*.bam")
 
     script:
     if (dorado_sheet) {
