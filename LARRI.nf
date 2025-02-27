@@ -18,13 +18,6 @@ if (params.profile) { exit 1, "--profile is WRONG use -profile" }
 if (params.help) { exit 0, helpMSG() }
 
 
-include { bam2fastq } from './modules/samtools.nf'
-include { filtlong } from './modules/filtlong.nf'
-include { rasusa } from './modules/rasusa.nf'
-include { flye } from './modules/flye.nf'
-include { medaka } from './modules/medaka.nf'
-include { dorado_basecaller; dorado_demux; transform_csv } from './modules/dorado.nf'
-
 // INPUT FILES
 
 // Ensure either BAM or pod5 is specified, but not both
@@ -65,17 +58,16 @@ if (!params.bam && !params.pod5) {
 /*********************** 
 * MAIN WORKFLOW
 ************************/
+include { bam2fastq } from './modules/samtools.nf'
+include { dorado_basecaller; dorado_demux; transform_csv } from './modules/dorado.nf'
+include { assembly_wf } from './workflows/assembly.nf' 
 
 workflow {
 
   // workflow with BAM input (only assembly) 
 	if (params.bam) {
 		fastq_files = bam2fastq(bam_input_ch)
-		fastq_filtered_files = filtlong(fastq_files)
-		fastq_filtered_subsampled_files = rasusa(fastq_filtered_files)
-		fasta_files = flye(fastq_filtered_subsampled_files).assembly
-		input_medaka = fastq_filtered_subsampled_files.join(fasta_files)
-		polished_files = medaka(input_medaka).polished_assembly 
+		assembly_wf(fastq_files)
 	} 
 
 	// worfklow with pod5 input (dorado basecalling)
@@ -91,11 +83,7 @@ workflow {
 			 
 			// assembly
 			fastq_files = bam2fastq(bam_files_filtered)
-			fastq_filtered_files = filtlong(fastq_files)
-			fastq_filtered_subsampled_files = rasusa(fastq_filtered_files)
-			fasta_files = flye(fastq_filtered_subsampled_files).assembly
-			input_medaka = fastq_filtered_subsampled_files.join(fasta_files)
-			polished_files = medaka(input_medaka).polished_assembly 
+			assembly_wf(fastq_files)
 		} 
 
 		else {
@@ -104,11 +92,7 @@ workflow {
 
 			// assembly
 			fastq_files = bam2fastq(bam_file)
-			fastq_filtered_files = filtlong(fastq_files)
-			fastq_filtered_subsampled_files = rasusa(fastq_filtered_files)
-			fasta_files = flye(fastq_filtered_subsampled_files).assembly
-			input_medaka = fastq_filtered_subsampled_files.join(fasta_files)
-			polished_files = medaka(input_medaka).polished_assembly 
+			assembly_wf(fastq_files)
 		}
   }
 
