@@ -11,8 +11,10 @@ process medaka {
     path("medaka"), emit: medaka_folder
 
     script:
-    """
-    medaka_consensus -i ${fastq_file} -d ${assembly_file} -t ${task.cpus} -m ${params.medaka_model} --bacteria -o medaka
-    cp medaka/consensus.fasta medaka.fasta
-    """
+        medaka_model_parameter = (params.medaka_model.trim() != '') ? '-m' : ''
+        bacteria_flag = params.bacteria_flag_medaka ? '--bacteria' : ''
+        """
+        medaka_consensus -i ${fastq_file} -d ${assembly_file} -t ${task.cpus} ${medaka_model_parameter} ${params.medaka_model} ${bacteria_flag} -o medaka
+        cp medaka/consensus.fasta medaka.fasta
+        """
 }

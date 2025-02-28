@@ -18,84 +18,126 @@ if (params.profile) { exit 1, "--profile is WRONG use -profile" }
 if (params.help) { exit 0, helpMSG() }
 
 
-// INPUT FILES
+// CHECK INPUT
 
-// Ensure either BAM or pod5 is specified, but not both
-if (!params.bam && !params.pod5) { 
-	error """\033[0;31mERROR:\033[0m You must specify either a BAM file/folder using the --bam option OR a pod5 file/folder using the --pod5 option.
-	
-	\033[0;33mUsage example:\033[0m
-	nextflow LARRI.nf --bam '*.bam' 
-	nextflow LARRI.nf --pod5 '*.pod5'
+// Ensure either BAM, fastq or pod5 is specified
+if (!params.bam && !params.pod5 && !params.fastq) { 
+    error """\033[0;31mERROR:\033[0m You must specify (only) one of the following options: 
+    a BAM file using the --bam option, 
+    a pod5 file/folder using the --pod5 option, 
+    or a FASTQ file using the --fastq option.
+    
+    \033[0;33mUsage examples:\033[0m
+    nextflow LARRI.nf --bam '*.bam' 
+    nextflow LARRI.nf --fastq '*.fastq.gz'
+    nextflow LARRI.nf --pod5 'file.pod5'  # For a single pod5 file
+    nextflow LARRI.nf --pod5 '/path/to/folder/'  # For a folder containing pod5 files
+    """
+    exit 1
+} 
+// Ensure exactly one input (BAM, fastq or pod5) is specified
+else if ((params.bam && params.pod5) || (params.bam && params.fastq) || (params.pod5 && params.fastq)) {
+    error """\033[0;31mERROR:\033[0m You cannot specify more than one of the following options at the same time: 
+    --bam, --pod5, or --fastq. Please provide only one.
+    
+    \033[0;33mUsage examples:\033[0m
+    nextflow LARRI.nf --bam '*.bam' 
+    nextflow LARRI.nf --pod5 '*.pod5'
+    nextflow LARRI.nf --fastq '*.fastq.gz'
+    """
+    exit 1
+} 
+
+else if ((params.bam || params.fastq) && params.basecalling) {
+	println """\033[0;33mWARNING The parameter --basecalling was selected, but no pod5 file/folder was provided.
 	"""
-	exit 1
-} else if (params.bam && params.pod5) {
-	error """\033[0;31mERROR:\033[0m You cannot specify both --bam and --pod5 at the same time. Please provide only one.
-	
-	\033[0;33mUsage example:\033[0m
-	nextflow LARRI.nf --bam '*.bam' 
-	nextflow LARRI.nf --pod5 '*.pod5'
-	"""
-	exit 1
-} else if (params.bam) { 
-	bam_input_ch = Channel
-		.fromPath(params.bam, checkIfExists: true)
-		.map { file -> tuple(file.baseName, file) }
-} else { 
-	pod5_input_ch = Channel
-		.fromPath(params.pod5, checkIfExists: true)
-	if (params.demux) {
-		sample_sheet_path = params.sample_sheet ? file(params.sample_sheet) : false
-
-		if (sample_sheet_path && !sample_sheet_path.exists()) {
-			exit 1, "ERROR: Sample sheet file '${params.sample_sheet}' not found"
-		}
-
-	}
 }
-
 
 /*********************** 
 * MAIN WORKFLOW
 ************************/
-include { bam2fastq } from './modules/samtools.nf'
+
+include { bam2fastq; unzip } from './modules/samtools.nf'
 include { dorado_basecaller; dorado_demux; transform_csv } from './modules/dorado.nf'
 include { assembly_wf } from './workflows/assembly.nf' 
 
 workflow {
 
-  // workflow with BAM input (only assembly) 
-	if (params.bam) {
-		fastq_files = bam2fastq(bam_input_ch)
+	// workflow with fastq input (only assembly)
+	if (params.fastq) {
+		if (params.fastq.endsWith('.fastq.gz')){
+			fastq_input_ch = Channel.fromPath(params.fastq, checkIfExists: true)
+			fastq_files = unzip(fastq_input_ch).map {file -> tuple(file.baseName, file)}
+		} else if (params.fastq.endsWith('.fastq')){
+			fastq_files = Channel.fromPath(params.fastq, checkIfExists: true)
+				.map {file -> tuple(file.baseName, file)}
+		} else {
+            error """\033[0;31mERROR:\033[0m The specified FASTQ file must have a .fastq or .fastq.gz extension.
+            
+            \033[0;33mUsage examples:\033[0;33m
+            nextflow LARRI.nf --fastq 'file.fastq' 
+            nextflow LARRI.nf --fastq 'file.fastq.gz'
+            """
+            exit 1
+		}
+		assembly_wf(fastq_files)
+	}
+
+    // workflow with BAM input (only assembly) 
+	else if (params.bam) {
+		if (params.bam.endsWith('.bam')){
+			bam_input_ch = Channel
+				.fromPath(params.bam, checkIfExists: true)
+				.map {file -> tuple(file.baseName, file)}
+
+			fastq_files = bam2fastq(bam_input_ch)
+		} else {
+            error """\033[0;31mERROR:\033[0m The specified BAM file must have a .bam extension.
+            
+            \033[0;33mUsage examples:\033[0;33m
+            nextflow LARRI.nf --bam 'file.bam' 
+            """
+            exit 1
+		}
 		assembly_wf(fastq_files)
 	} 
 
+
 	// worfklow with pod5 input (dorado basecalling)
  	else if (params.pod5) {
-		
+		pod5_input_ch = Channel.fromPath(params.pod5, checkIfExists: true)
+			
+		// workflow with dorado basecalling and dorado demux
 		if (params.demux) {
-			basecalled_bam = dorado_basecaller(pod5_input_ch)
+			// create dorado sample sheet if the sample sheet is provided
+			sample_sheet_path = params.sample_sheet ? file(params.sample_sheet) : false
+			if (sample_sheet_path && !sample_sheet_path.exists()) {exit 1, "ERROR: Sample sheet file '${params.sample_sheet}' not found"}
 			dorado_sheet = sample_sheet_path ? transform_csv(sample_sheet_path) : ""
-			bam_files = dorado_demux(basecalled_bam, dorado_sheet).flatten()
-			bam_files_filtered = bam_files.filter { file ->
-				file.simpleName != "unclassified"  
-			}.map {file -> tuple(file.baseName, file)}
-			 
-			// assembly
-			fastq_files = bam2fastq(bam_files_filtered)
-			assembly_wf(fastq_files)
-		} 
 
+			//basecalling + demux
+			basecalled_bam = dorado_basecaller(pod5_input_ch)
+			bam_files_output = dorado_demux(basecalled_bam, dorado_sheet).flatten()
+			bam_files = bam_files_output.filter {file -> file.simpleName != "unclassified"}
+				.map {file -> tuple(file.baseName, file)}
+				
+			// assembly
+			fastq_files = bam2fastq(bam_files)
+			assembly_wf(fastq_files)
+		}
+		
+		// workflow with only dorado basecaller 
 		else {
+			//basecalling
 			bam_folder = dorado_basecaller(pod5_input_ch)
 			bam_file = bam_folder.map {file -> tuple(file.baseName, file)}
+		}
 
-			// assembly
+		if (!params.basecalling){
+			//running the assembly unless the user specified to only basecall 
 			fastq_files = bam2fastq(bam_file)
 			assembly_wf(fastq_files)
 		}
-  }
-
+	}
 }
 
 
@@ -113,12 +155,17 @@ def helpMSG() {
 	LARRI - Long-reads Assembly Reconstruction and Refinement pIpeline
 
 	${c_yellow}Usage example:${c_reset}
-	nextflow LARRI.nf  --bam '*.bam' 
+	nextflow LARRI.nf --bam '*.bam' 
+	nextflow LARRI.nf --fastq '*.fastq.gz' 
+	nextflow LARRI.nf --pod5 'file.pod5'                     # For a single pod5 file
+	nextflow LARRI.nf --pod5 '/path/to/folder/'              # For a folder containing pod5 files
+	nextflow LARRI.nf --pod5 'file.pod5' --basecalling       # Run only basecalling
 
 	${c_yellow}Input${c_reset}
-	${c_green} --bam ${c_reset}             '*.bam'         -> BAM file to be assembled
+	${c_green} --bam ${c_reset}      '*.bam'                              -> BAM file to be assembled
+	${c_green} --fastq ${c_reset}    '*.fastq'                            -> FASTQ file to be assembled
+	${c_green} --pod5 ${c_reset}     'file.pod5' or '/path/to/folder/'    -> Pod5 file or folder containing pod5 files
  
-	${c_dim}  ..change above input to csv:${c_reset} ${c_green}--list ${c_reset}
 
 	${c_yellow}General Options:${c_reset}
 	--cores             Max cores per process for local use [default: $params.cores]

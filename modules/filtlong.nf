@@ -10,7 +10,7 @@ process filtlong {
     tuple val(sample_id), path("${sample_id}.fastq.gz") 
 
     script:
-    """
-    filtlong --min_length ${params.min_length_filtlong} ${fastq_file} | gzip > ${sample_id}.fastq.gz
-    """
+        """
+        filtlong --min_length ${params.min_length_filtlong} ${fastq_file} | gzip > ${sample_id}.fastq.gz
+        """
 }

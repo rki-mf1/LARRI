@@ -14,3 +14,15 @@ process bam2fastq {
     samtools bam2fq ${bam_file} > ${sample_id}.fastq
     """
 }
+
+process unzip {
+    input:
+    path fastq_compressed
+
+    output:
+    path "${fastq_compressed.baseName}" 
+    script:
+    """
+    gunzip -c ${fastq_compressed} > ${fastq_compressed.baseName}
+    """
+}
