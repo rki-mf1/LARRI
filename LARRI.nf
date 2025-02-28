@@ -119,22 +119,18 @@ workflow {
 			bam_files_output = dorado_demux(basecalled_bam, dorado_sheet).flatten()
 			bam_files = bam_files_output.filter {file -> file.simpleName != "unclassified"}
 				.map {file -> tuple(file.baseName, file)}
-				
-			// assembly
-			fastq_files = bam2fastq(bam_files)
-			assembly_wf(fastq_files)
 		}
 		
 		// workflow with only dorado basecaller 
 		else {
 			//basecalling
 			bam_folder = dorado_basecaller(pod5_input_ch)
-			bam_file = bam_folder.map {file -> tuple(file.baseName, file)}
+			bam_files = bam_folder.map {file -> tuple(file.baseName, file)}
 		}
 
 		if (!params.basecalling){
 			//running the assembly unless the user specified to only basecall 
-			fastq_files = bam2fastq(bam_file)
+			fastq_files = bam2fastq(bam_files)
 			assembly_wf(fastq_files)
 		}
 	}
