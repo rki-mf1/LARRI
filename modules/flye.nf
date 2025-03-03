@@ -7,12 +7,12 @@ process flye {
     tuple val(sample_id), path(fastq_file)
 
     output:
-    tuple val(sample_id), path("flye_assembly.fasta"), emit: assembly
+    tuple val(sample_id), path("${sample_id}.flye_assembly.fasta"), emit: assembly
     path("flye_assembly"), emit: flye_folder
 
     script:
         """
         flye --nano-hq ${fastq_file} -t ${task.cpus} -g ${params.genome_size_mb}m -o flye_assembly
-        cp flye_assembly/assembly.fasta flye_assembly.fasta
+        cp flye_assembly/assembly.fasta ${sample_id}.flye_assembly.fasta
         """
 }
