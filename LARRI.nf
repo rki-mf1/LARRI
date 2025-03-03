@@ -181,9 +181,14 @@ def helpMSG() {
 
 	${c_yellow}Execution/Engine profiles:${c_reset}
 	The pipeline supports profiles to run via different ${c_green}Executers${c_reset} and ${c_blue}Engines${c_reset} e.g.: -profile ${c_green}local${c_reset},${c_blue}docker${c_reset}
-	
+
+	${c_green}Executors${c_reset} (choose one):
+	local			[for example on your laptop or a work station]
+	slurm
+
 	${c_blue}Engines${c_reset} (choose one):
-	  docker
+	  docker		[recommended]
+	  singularity
 	
 	Per default: -profile local,docker is executed (-profile standard).
 	
