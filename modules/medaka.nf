@@ -7,7 +7,7 @@ process medaka {
     tuple val(sample_id), path(fastq_file), path(assembly_file)
 
     output:
-    tuple val(sample_id), path("medaka.fasta"), emit: polished_assembly
+    tuple val(sample_id), path("${sample_id}.medaka.fasta"), emit: polished_assembly
     path("medaka"), emit: medaka_folder
 
     script:
@@ -15,6 +15,6 @@ process medaka {
         bacteria_flag = params.bacteria_flag_medaka ? '--bacteria' : ''
         """
         medaka_consensus -i ${fastq_file} -d ${assembly_file} -t ${task.cpus} ${medaka_model_parameter} ${params.medaka_model} ${bacteria_flag} -o medaka
-        cp medaka/consensus.fasta medaka.fasta
+        cp medaka/consensus.fasta ${sample_id}.medaka.fasta
         """
 }
