@@ -8,3 +8,5 @@ report*
 conda/
 data/
 dorado_models/
+*.sh
+logs/
