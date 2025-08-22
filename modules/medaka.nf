@@ -14,6 +14,12 @@ process medaka {
         medaka_model_parameter = (params.medaka_model.trim() != '') ? '-m' : ''
         bacteria_flag = params.bacteria_flag_medaka ? '--bacteria' : ''
         """
+        python - <<'EOF'
+        import torch
+        print("PyTorch version:", torch.__version__)
+        print("CUDA available:", torch.cuda.is_available())
+        print("Visible GPUs:", torch.cuda.device_count())
+        EOF
         medaka_consensus -i ${fastq_file} -d ${assembly_file} -t ${task.cpus} ${medaka_model_parameter} ${params.medaka_model} ${bacteria_flag} -o medaka
         cp medaka/consensus.fasta ${sample_id}.medaka.fasta
         """
