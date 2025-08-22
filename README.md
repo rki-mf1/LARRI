@@ -91,7 +91,7 @@ To also run [Dorado demultiplexing](https://github.com/nanoporetech/dorado?tab=r
 - The Dorado basecaller will **not trim the barcodes**.  
 - The Dorado demux command will run immediately after basecalling.  
 
-Optionally, a **tsv sample sheet** (provided using the --sample_sheet option) can be provided to specify which barcodes are of interest. The sample sheet is a simplified version of the one required by [Dorado](https://github.com/nanoporetech/dorado/blob/release-v1.1/documentation/SampleSheets.md) and has the following format:
+Optionally, a **tsv sample sheet** (provided using the --sample_sheet option) can be used to specify which barcodes are of interest. The sample sheet is a simplified version of the one required by [Dorado](https://github.com/nanoporetech/dorado/blob/release-v1.1/documentation/SampleSheets.md) and has the following format:
 
 | alias     | barcode   |
 |-----------|-----------|
