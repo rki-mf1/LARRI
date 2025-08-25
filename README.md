@@ -103,8 +103,9 @@ Optionally, a **tsv sample sheet** (provided using the --sample_sheet option) ca
 
 Here, the `alias` column defines the user-selected sample names, which will be used by the pipeline to rename the barcodes. In the absence of a sample sheets, all barcodes will be assembled.
 
-### ASSEMBLY PARAMETERS
+When the parameter `--modifications` is enabled (default: `false`), Dorado will also basecall modified bases, specifically **6mA**, **4mC**, and **5mC**.
 
+### ASSEMBLY PARAMETERS
 
 The assembly workflow follows a modular structure with optional steps for read filtering, subsampling, assembly, and polishing. 
 
