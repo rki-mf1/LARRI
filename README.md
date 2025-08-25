@@ -99,5 +99,33 @@ Optionally, a **tsv sample sheet** (provided using the --sample_sheet option) ca
 | species_2 | barcode15 |
 | species_3 | barcode16 |
 
-Here, the `alias` column defines the user-selected sample names, which will be used by the pipeline to rename the barcodes.  
-In the absence of a sample sheets, all barcodes will be assembled.
+Here, the `alias` column defines the user-selected sample names, which will be used by the pipeline to rename the barcodes. In the absence of a sample sheets, all barcodes will be assembled.
+
+### ASSEMBLY PARAMETERS
+
+
+The assembly workflow follows a modular structure with optional steps for read filtering, subsampling, assembly, and polishing. 
+
+1. **Read Filtering (Filtlong)** *(optional)*
+If `--run_filtlong` is enabled (default: true), input reads shorter than `--min_length_filtlong` are removed. 
+
+2. **Read Subsampling (Rasusa)** *(optional)*
+If `--run_rasusa` is enabled, reads are subsampled to reach the target coverage specified by `--coverage_rasusa` (default: **100×**).
+
+3. **Assembly (Flye)** 
+The expected genome size can be provided via `--genome_size_mb`.
+
+4. **Polishing (Medaka)**
+The model can be specified with `--medaka_model`. If `--bacteria_flag_medaka` is true, bacterial-specific settings are applied.
+
+### Default Parameters
+
+| Parameter                | Default Value       | Description                                                      |
+|---------------------------|---------------------|------------------------------------------------------------------|
+| `--run_filtlong`          | `true`              | Enable read filtering with Filtlong                              |
+| `--min_length_filtlong`   | `500`               | Minimum read length to keep (bp)                                 |
+| `--run_rasusa`            | `true`              | Enable read subsampling with Rasusa                              |
+| `--coverage_rasusa`       | `100`               | Target coverage for subsampling                                  |
+| `--genome_size_mb`        | `3.5`               | Expected genome size (Mb) for Flye                               |
+| `--medaka_model`          |       | If not specified, the model is automatically inferred by Medaka (default: latest available model).                            |
+| `--bacteria_flag_medaka`  | `true`              | Use bacterial-specific Medaka options                            |
