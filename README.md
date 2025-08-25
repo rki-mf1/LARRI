@@ -15,6 +15,8 @@ For POD5 files, it uses [**Dorado**](https://github.com/nanoporetech/dorado) to 
 
 ![Alt text](images/LARRI_workflow.png)
 
+In the subway-style diagram above, the green track represents the default workflow. The pipeline is modular, so alternative tracks can be followed by enabling or disabling steps through parameters.
+
 ## How to Run
 
 To run **LARRI**, you must specify **exactly one input type**:  
