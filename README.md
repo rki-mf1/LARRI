@@ -101,7 +101,7 @@ The `--basecalling` parameter can be used to perform only the basecalling step, 
 The assembly workflow follows a modular structure with optional steps for read filtering, subsampling, assembly, and polishing. 
 
 1. **Read Filtering (Filtlong)** *(optional)*
-If `--run_filtlong` is enabled (default: true), input reads shorter than `--min_length_filtlong` are removed. 
+If `--run_filtlong` is enabled, input reads shorter than `--min_length_filtlong` are removed. 
 
 2. **Read Subsampling (Rasusa)** *(optional)*
 If `--run_rasusa` is enabled, reads are subsampled to reach the target coverage specified by `--coverage_rasusa` (default: **100×**).
