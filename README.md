@@ -96,7 +96,7 @@ When the parameter `--modifications` is enabled (default: `false`), Dorado will 
 
 The `--basecalling` parameter can be used to perform only the basecalling step, without proceeding to assembly
 
-### ASSEMBLY PARAMETERS
+## Assembly Workflow
 
 The assembly workflow follows a modular structure with optional steps for read filtering, subsampling, assembly, and polishing. 
 
