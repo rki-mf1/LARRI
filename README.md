@@ -15,7 +15,7 @@ For POD5 files, it uses [**Dorado**](https://github.com/nanoporetech/dorado) to 
 
 ![Alt text](images/LARRI_workflow.png)
 
-In the subway-style diagram above, the green track represents the default workflow. The pipeline is modular, so alternative tracks can be followed by enabling or disabling steps through parameters.
+In the subway-style diagram below, the green track represents the default workflow. The pipeline is modular, so alternative tracks can be followed by enabling or disabling steps through parameters. It is also possible to run the pipeline just for basecalling, without performing the assembly steps.
 
 ## How to Run
 
@@ -104,6 +104,8 @@ Optionally, a **tsv sample sheet** (provided using the --sample_sheet option) ca
 Here, the `alias` column defines the user-selected sample names, which will be used by the pipeline to rename the barcodes. In the absence of a sample sheets, all barcodes will be assembled.
 
 When the parameter `--modifications` is enabled (default: `false`), Dorado will also basecall modified bases, specifically **6mA**, **4mC**, and **5mC**.
+
+The `--basecalling` parameter can be used to perform only the basecalling step, without proceeding to assembly
 
 ### ASSEMBLY PARAMETERS
 
