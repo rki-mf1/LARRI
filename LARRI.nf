@@ -147,20 +147,39 @@ def helpMSG() {
 	log.info """
 	____________________________________________________________________________________________
 
-	LARRI - Long-reads Assembly Reconstruction and Refinement pIpeline
+    ${c_yellow}LARRI - Long-reads Assembly Reconstruction and Refinement pIpeline${c_reset}
 
-	${c_yellow}Usage example:${c_reset}
-	nextflow run rki-mf1/LARRI --bam '*.bam' 
-	nextflow run rki-mf1/LARRI --fastq '*.fastq.gz' 
-	nextflow run rki-mf1/LARRI --pod5 file.pod5                     # For a single pod5 file
-	nextflow run rki-mf1/LARRI --pod5 /path/to/folder/              # For a folder containing pod5 files
-	nextflow run rki-mf1/LARRI --pod5 file.pod5 --basecalling       # Run only basecalling
+    This pipeline provides a simple workflow for assembling long reads, supporting BAM, FASTQ, or POD5 input files.
+    ⚠ Note: Only one input type can be processed at a time.
+    
+    For POD5 files, ${c_blue}Dorado${c_reset} is used for basecalling. Basecalling-only runs are also supported.
 
-	${c_yellow}Input${c_reset}
-	${c_green} --bam ${c_reset}      '*.bam'                            -> BAM file to be assembled
-	${c_green} --fastq ${c_reset}    '*.fastq'                          -> FASTQ file to be assembled
-	${c_green} --pod5 ${c_reset}     file.pod5 or /path/to/folder/    	-> Pod5 file or folder containing pod5 files
- 
+    ${c_yellow}Usage Examples:${c_reset}
+      nextflow run rki-mf1/LARRI --bam 'sample.bam'                # Single BAM file
+      nextflow run rki-mf1/LARRI --fastq 'sample.fastq.gz'         # Single FASTQ file
+      nextflow run rki-mf1/LARRI --bam '*.bam'                     # Multiple BAM files
+      nextflow run rki-mf1/LARRI --fastq '*.fastq.gz'              # Multiple FASTQ files
+      nextflow run rki-mf1/LARRI --pod5 'file.pod5'                # Single pod5 file
+      nextflow run rki-mf1/LARRI --pod5 '/path/to/folder/'         # Folder of pod5 files
+      nextflow run rki-mf1/LARRI --pod5 'file.pod5' --basecalling  # Basecalling only
+
+    ${c_yellow}Input Options:${c_reset}
+      ${c_green}--bam${c_reset}       '*.bam'                         -> BAM file(s) to be assembled
+      ${c_green}--fastq${c_reset}     '*.fastq'                       -> FASTQ file(s) to be assembled
+      ${c_green}--pod5${c_reset}      file.pod5 or /path/to/folder/   -> Pod5 file(s) for basecalling
+      ${c_green}--sample_sheet${c_reset}                              -> Optional tsv to rename barcodes (pod5 only)
+
+    ${c_yellow}Pipeline Features:${c_reset}
+      - ${c_blue}Basecalling:${c_reset} Dorado with optional demultiplexing (--demux)
+      - ${c_blue}Read Filtering:${c_reset} Filtlong (--run_filtlong, --min_length_filtlong)
+      - ${c_blue}Read Subsampling:${c_reset} Rasusa (--run_rasusa, --coverage_rasusa)
+      - ${c_blue}Assembly:${c_reset} Flye (--genome_size_mb)
+      - ${c_blue}Polishing:${c_reset} Medaka (--medaka_model, --bacteria_flag_medaka)
+
+    ${c_yellow}Basecalling Options (pod5 only):${c_reset}
+      --demux                  -> Run Dorado demultiplexing after basecalling
+      --modifications          -> Basecall modified bases (6mA, 4mC, 5mC)
+      --basecalling            -> Run only the basecalling step
 
 	${c_yellow}General Options:${c_reset}
 	--cores             Max cores per process for local use [default: $params.cores]
