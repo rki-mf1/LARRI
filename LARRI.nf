@@ -57,7 +57,7 @@ else if ((params.bam || params.fastq) && params.basecalling) {
 * MAIN WORKFLOW
 ************************/
 
-include { bam2fastq; unzip } from './modules/samtools.nf'
+include { bam2fastq} from './modules/samtools.nf'
 include { dorado_basecaller; dorado_demux; transform_csv } from './modules/dorado.nf'
 include { assembly_wf } from './workflows/assembly.nf' 
 
@@ -65,10 +65,7 @@ workflow {
 
 	// workflow with fastq input (only assembly)
 	if (params.fastq) {
-		if (params.fastq.endsWith('.fastq.gz')){
-			fastq_input_ch = Channel.fromPath(params.fastq, checkIfExists: true)
-			fastq_files = unzip(fastq_input_ch).map {file -> tuple(file.baseName, file)}
-		} else if (params.fastq.endsWith('.fastq')){
+		if (params.fastq.endsWith('.fastq.gz') || params.fastq.endsWith('.fastq')) {
 			fastq_files = Channel.fromPath(params.fastq, checkIfExists: true)
 				.map {file -> tuple(file.baseName, file)}
 		} else {
@@ -82,6 +79,7 @@ workflow {
 		}
 		assembly_wf(fastq_files)
 	}
+
 
     // workflow with BAM input (only assembly) 
 	else if (params.bam) {
@@ -99,6 +97,7 @@ workflow {
             """
             exit 1
 		}
+		
 		assembly_wf(fastq_files)
 	} 
 
