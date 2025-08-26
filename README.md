@@ -32,39 +32,28 @@ Run with a single BAM file:
 nextflow run rki-mf1/LARRI -r 0.0.1 --bam 'sample.bam'
 ```
 
-Run with multiple BAM files (using wildcard):
-
-```
-nextflow run rki-mf1/LARRI -r 0.0.1 --bam '*.bam'
-```
-
 Run with a single FASTQ file:
 
 ```
-bash
 nextflow run rki-mf1/LARRI -r 0.0.1 --fastq 'sample.fastq.gz'
 ```
 
-Run with multiple FASTQ files (using wildcard):
+Run with multiple BAM or FASTQ files (using wildcard):
 
 ```
+nextflow run rki-mf1/LARRI -r 0.0.1 --bam '*.bam'
 nextflow run rki-mf1/LARRI -r 0.0.1 --fastq '*.fastq.gz'
 ```
-Run with a single pod5 file:
+Run with a single pod5 file or a folder:
 
 ```
 nextflow run valegale/LARRI -r 0.0.1 --pod5 'file.pod5'
-```
-
-Run with a folder of pod5 files:
-
-```
 nextflow run valegale/LARRI -r 0.0.1 --pod5 '/path/to/folder/'
 ```
 
-> **Important**:  
-> - Only one of the options `--bam`, `--fastq`, or `--pod5` can be provided at a time.  
-> - Multiple input files can only be used with `--bam` and `--fastq` (via wildcards).  
+> **Important**:
+> - Only one of the options `--bam`, `--fastq`, or `--pod5` can be provided at a time. 
+> - Multiple input files can only be used with `--bam` and `--fastq` (via wildcards).
 > - The `--pod5` option only supports a single file or a folder of files.  
 
 
