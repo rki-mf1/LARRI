@@ -112,7 +112,7 @@ If `--run_filtlong` is enabled, input reads shorter than `--min_length_filtlong`
 If `--run_rasusa` is enabled, reads are subsampled to reach the target coverage specified by `--coverage_rasusa` (default: **100×**). The expected genome size can be provided via `--genome_size_mb` (default: **3.5 Mbp**).
 
 4. **Assembly (Flye)** 
-Reads are assembled using Flye. The genome size is also specified with --genome_size_mb.
+Reads are assembled using Flye. The genome size is also specified with `--genome_size_mb`.
 
 5. **Polishing (Medaka)**
 The model can be specified with `--medaka_model`. If `--bacteria_flag_medaka` is true, bacterial-specific settings are applied.
