@@ -109,12 +109,12 @@ The assembly workflow follows a modular structure with optional steps for read f
 If `--run_filtlong` is enabled, input reads shorter than `--min_length_filtlong` are removed (default: **500 bp**). 
 
 2. **Read Subsampling (Rasusa)** *(optional)*
-If `--run_rasusa` is enabled, reads are subsampled to reach the target coverage specified by `--coverage_rasusa` (default: **100×**).
+If `--run_rasusa` is enabled, reads are subsampled to reach the target coverage specified by `--coverage_rasusa` (default: **100×**). The expected genome size can be provided via `--genome_size_mb` (default: **3.5 Mbp**).
 
-3. **Assembly (Flye)** 
-The expected genome size can be provided via `--genome_size_mb`. (default: **3.5 Mbp**)
+4. **Assembly (Flye)** 
+Reads are assembled using Flye. The genome size is also specified with --genome_size_mb.
 
-4. **Polishing (Medaka)**
+5. **Polishing (Medaka)**
 The model can be specified with `--medaka_model`. If `--bacteria_flag_medaka` is true, bacterial-specific settings are applied.
 
 ### Default Parameters
