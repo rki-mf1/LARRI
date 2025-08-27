@@ -7,10 +7,10 @@ process bam2fastq {
     tuple val(sample_id), path(bam_file)
 
     output:
-    tuple val(sample_id), path("${sample_id}.fastq") 
+    tuple val(sample_id), path("${sample_id}.fastq.gz")
 
     script:
     """
-    samtools bam2fq ${bam_file} > ${sample_id}.fastq
+    samtools bam2fq ${bam_file} | gzip -c > ${sample_id}.fastq.gz
     """
 }

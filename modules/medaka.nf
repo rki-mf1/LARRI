@@ -7,12 +7,20 @@ process medaka {
     tuple val(sample_id), path(fastq_file), path(assembly_file)
 
     output:
-    tuple val(sample_id), path("medaka.fasta"), emit: polished_assembly
+    tuple val(sample_id), path("${sample_id}.medaka.fasta"), emit: polished_assembly
     path("medaka"), emit: medaka_folder
 
     script:
-    """
-    medaka_consensus -i ${fastq_file} -d ${assembly_file} -t ${task.cpus} -m ${params.medaka_model} --bacteria -o medaka
-    cp medaka/consensus.fasta medaka.fasta
-    """
+        medaka_model_parameter = (params.medaka_model.trim() != '') ? '-m' : ''
+        bacteria_flag = params.bacteria_flag_medaka ? '--bacteria' : ''
+        """
+        python - <<'EOF'
+        import torch
+        print("PyTorch version:", torch.__version__)
+        print("CUDA available:", torch.cuda.is_available())
+        print("Visible GPUs:", torch.cuda.device_count())
+        EOF
+        medaka_consensus -i ${fastq_file} -d ${assembly_file} -t ${task.cpus} ${medaka_model_parameter} ${params.medaka_model} ${bacteria_flag} -o medaka
+        cp medaka/consensus.fasta ${sample_id}.medaka.fasta
+        """
 }
