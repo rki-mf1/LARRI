@@ -87,7 +87,8 @@ To also run [Dorado demultiplexing](https://github.com/nanoporetech/dorado?tab=r
 - The Dorado basecaller will **not trim the barcodes**.  
 - The Dorado demux command will run immediately after basecalling.  
 
-Optionally, a **tsv sample sheet** (provided using the `--sample_sheet` option) can be used to specify which barcodes are of interest. The sample sheet is a simplified version of the one required by [Dorado](https://github.com/nanoporetech/dorado/blob/release-v1.1/documentation/SampleSheets.md) and has the following format:
+Optionally, a TSV sample sheet can be provided with the --sample_sheet option to specify which barcodes should be processed.
+Optionally, a **tsv sample sheet** can be provided with thE `--sample_sheet` option) to specify which barcodes should be processed. The sample sheet is a simplified version of the one required by [Dorado](https://github.com/nanoporetech/dorado/blob/release-v1.1/documentation/SampleSheets.md) and has the following format:
 
 | alias     | barcode   |
 |-----------|-----------|
@@ -95,7 +96,7 @@ Optionally, a **tsv sample sheet** (provided using the `--sample_sheet` option) 
 | species_2 | barcode15 |
 | species_3 | barcode16 |
 
-Here, the `alias` column defines the user-selected sample names, which will be used by the pipeline to rename the barcodes. In the absence of a sample sheets, all barcodes will be assembled.
+Here, the `alias` column defines the user-selected sample names, which will be used by the pipeline to rename the corresponding barcodes. Only the barcodes listed in the sample sheet are extracted and assembled. Any barcode not included in the sheet is ignored. If no sample sheet is provided, the pipeline will process all detected barcodes (without renaming).
 
 When the parameter `--modifications` is enabled (default: `false`), Dorado will also basecall modified bases, specifically **6mA**, **4mC**, and **5mC**.
 
