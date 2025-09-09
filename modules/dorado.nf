@@ -27,9 +27,9 @@ process dorado_basecaller {
     trim_adapters = params.demux ? '--trim adapters' : ''
     modifications = params.modifications ? ',6mA,4mC_5mC' : ''
         """
-        mkdir -p ${projectDir}/${params.dorado_models_folder}
+        mkdir -p ${launchDir}/${params.dorado_models_folder}
         dorado basecaller sup${modifications} ${trim_adapters} \
-            --models-directory ${projectDir}/${params.dorado_models_folder} \
+            --models-directory ${launchDir}/${params.dorado_models_folder} \
             ${path_pod5} > ${path_pod5.simpleName}.bam
         """
 }
