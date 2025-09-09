@@ -87,7 +87,7 @@ To also run [Dorado demultiplexing](https://github.com/nanoporetech/dorado?tab=r
 - The Dorado basecaller will **not trim the barcodes**.  
 - The Dorado demux command will run immediately after basecalling. By default, the pipeline uses the kit `--kit-name SQK-NBD114-24`. This can be overridden by specifying a different kit with the `--dorado_kit` parameter. 
 
-Optionally, a **tsv sample sheet** can be provided with the `--sample_sheet` option to specify which barcodes should be processed. The sample sheet is a simplified version of the one required by [Dorado](https://github.com/nanoporetech/dorado/blob/release-v1.1/documentation/SampleSheets.md) and has the following format:
+Optionally, a **csv sample sheet** can be provided with the `--sample_sheet` option to specify which barcodes should be processed. The sample sheet is a simplified version of the one required by [Dorado](https://github.com/nanoporetech/dorado/blob/release-v1.1/documentation/SampleSheets.md) and has the following format:
 
 | alias     | barcode   |
 |-----------|-----------|
