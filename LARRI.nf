@@ -174,7 +174,7 @@ def helpMSG() {
       - ${c_blue}Read Filtering:${c_reset} Filtlong (--run_filtlong, --min_length_filtlong)
       - ${c_blue}Read Subsampling:${c_reset} Rasusa (--run_rasusa, --coverage_rasusa)
       - ${c_blue}Assembly:${c_reset} Flye (--genome_size_mb)
-      - ${c_blue}Polishing:${c_reset} Medaka (--medaka_model, --bacteria_flag_medaka)
+      - ${c_blue}Polishing:${c_reset} Medaka (--medaka_model)
 
     ${c_yellow}Basecalling Options (pod5 only):${c_reset}
       --demux                  -> Run Dorado demultiplexing after basecalling

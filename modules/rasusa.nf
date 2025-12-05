@@ -11,8 +11,6 @@ process rasusa {
 
     script:
         """
-        rasusa --version
-        rasusa -h
         rasusa reads --coverage ${params.coverage_rasusa} --genome-size ${params.genome_size_mb}mB ${fastq_file} -o ${sample_id}_subsampled.fastq.gz
         """
 }

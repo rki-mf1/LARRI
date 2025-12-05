@@ -2,7 +2,7 @@ process dorado_basecaller {
     label 'dorado'
     if (params.run_dorado_with_gpu) {
 	    if (workflow.profile.contains('slurm')) {
-		clusterOptions = '--gpus=1 --time=06:00:00'
+		clusterOptions '--gpus=1 --time=06:00:00'
 	    }
         if (workflow.profile.contains('docker')) {
                 containerOptions '--gpus all'
@@ -11,10 +11,10 @@ process dorado_basecaller {
                 containerOptions '--nv'
         }
         else if (!workflow.profile.contains('slurm')) { 
-            containerOptions = '--gpus all'
+            containerOptions '--gpus all'
         }
     }
-
+ 
     publishDir "${params.outdir}/${path_pod5.simpleName}", mode: 'copy'
 
     input:

@@ -11,8 +11,10 @@ process flye {
     path("flye_assembly"), emit: flye_folder
 
     script:
+    meta = params.flye_meta ? '--meta' : ''
+    genome_size = params.flye_meta ? '' : "-g ${params.genome_size_mb}m"
         """
-        flye --nano-hq ${fastq_file} -t ${task.cpus} -g ${params.genome_size_mb}m -o flye_assembly
+        flye --nano-hq ${fastq_file} -t ${task.cpus} ${meta} ${genome_size} -o flye_assembly
         cp flye_assembly/assembly.fasta ${sample_id}.flye_assembly.fasta
         """
 }
